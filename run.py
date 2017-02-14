@@ -22,6 +22,20 @@ condB = [stim_orig, stim_flipped]
 
 window = visual.Window(fullscr=config.FULLSCREEN, allowStencil=True)
 
+def show_instructions():
+    msg = """
+    3D Mental Rotation Study
+
+    Press the left arrow if the two objects can be rotated into the same configuration, and the right if they are different.
+
+    Feedback Color: Green means Correct, Red means Incorrect.
+    """
+    text = visual.TextStim(window, text=msg, alignVert='center')
+    text.draw()
+    window.flip()
+    event.waitKeys()
+show_instructions()
+
 scene = rc.Scene(meshes=[], bgColor=config.BGCOLOR)
 scene.light.position.z = 20
 scene.camera.projection = rc.OrthoProjection(origin='center', coords='relative')
@@ -33,7 +47,11 @@ fbo = rc.FBO(rc.Texture(width=window.size[0] * config.AA_MULTISAMPLING_FACTOR,
                         height=window.size[1] * config.AA_MULTISAMPLING_FACTOR))
 quad.texture = fbo.texture
 
+fixcross = visual.TextStim(window, text='+', alignVert='center', alignHoriz='center')
+
+
 with open('data/explog.csv', 'w') as logfile:
+
 
     fieldnames = ['Trial', 'Match', 'RotationA', 'RotationB', 'Correct', 'RT']
     logwriter = csv.DictWriter(logfile, fieldnames=fieldnames)
@@ -50,6 +68,12 @@ with open('data/explog.csv', 'w') as logfile:
 
         condition = random.choice([condA, condB])
         scene.meshes = condition
+
+        # Draw Fixation Cross
+        scene.clear()
+        fixcross.draw()
+        window.flip()
+        time.sleep(1.)
 
 
         with rc.resources.genShader, fbo:
@@ -81,7 +105,7 @@ with open('data/explog.csv', 'w') as logfile:
         logwriter.writerow(trialdata)
 
         # Provide Feedback for Response
-        for rot in np.linspace(xrot, xrot + xrot_offset, 20):
+        for rot in np.linspace(xrot, xrot + xrot_offset, 15):
             stim_orig.rotation.x = rot
             stim_orig.update()
             with rc.resources.genShader, fbo:
@@ -91,7 +115,7 @@ with open('data/explog.csv', 'w') as logfile:
             window.flip()
 
         feedback_color = (0., .5, 0.) if correct else (.5, 0., 0.)
-        for color, pauseTime in zip([feedback_color, config.BGCOLOR], [1.5, .1]):
+        for color, pauseTime in zip([feedback_color, config.BGCOLOR], [1.5, .001]):
             scene.bgColor = color
             with rc.resources.genShader, fbo:
                 scene.draw()
@@ -99,6 +123,7 @@ with open('data/explog.csv', 'w') as logfile:
                 quad.draw()
             window.flip()
             time.sleep(pauseTime)
+
 
 
 

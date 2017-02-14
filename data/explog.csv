@@ -1,1 +1,4 @@
 Trial,Match,RotationA,RotationB,Correct,RT
+1,True,247.5,187.5,False,0.71096
+2,False,45.0,105.0,True,1.7870440000000007
+3,False,225.0,165.0,True,1.4088150000000006
