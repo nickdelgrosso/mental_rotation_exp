@@ -41,11 +41,6 @@ scene.light.position.z = 20
 scene.camera.projection = rc.OrthoProjection(origin='center', coords='relative')
 camera = scene.camera
 
-# Used for Antialiasing.  Not necessary, but makes everything look nicer.  Draw with rc.deferredShader
-quad = rc.gen_fullscreen_quad()
-fbo = rc.FBO(rc.Texture(width=window.size[0] * config.AA_MULTISAMPLING_FACTOR,
-                        height=window.size[1] * config.AA_MULTISAMPLING_FACTOR))
-quad.texture = fbo.texture
 
 fixcross = visual.TextStim(window, text='+', alignVert='center', alignHoriz='center')
 
@@ -76,10 +71,8 @@ with open('data/explog.csv', 'w') as logfile:
         time.sleep(1.)
 
 
-        with rc.resources.genShader, fbo:
+        with rc.default_shader:
             scene.draw()
-        with rc.resources.deferredShader:
-            quad.draw()
         window.flip()
 
         # Collect Response
@@ -108,19 +101,16 @@ with open('data/explog.csv', 'w') as logfile:
         for rot in np.linspace(xrot, xrot + xrot_offset, 15):
             stim_orig.rotation.x = rot
             stim_orig.update()
-            with rc.resources.genShader, fbo:
+            with rc.default_shader:
                 scene.draw()
-            with rc.resources.deferredShader:
-                quad.draw()
             window.flip()
 
         feedback_color = (0., .5, 0.) if correct else (.5, 0., 0.)
         for color, pauseTime in zip([feedback_color, config.BGCOLOR], [1.5, .001]):
             scene.bgColor = color
-            with rc.resources.genShader, fbo:
+            with rc.default_shader:
                 scene.draw()
-            with rc.resources.deferredShader:
-                quad.draw()
+
             window.flip()
             time.sleep(pauseTime)
 
