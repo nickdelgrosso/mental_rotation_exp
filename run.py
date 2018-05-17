@@ -46,13 +46,15 @@ show_instructions()
 
 with open('data/explog.csv', 'w') as logfile:
 
-
+    # Initialize csv data file for writing.
     fieldnames = ['Trial', 'Match', 'RotationA', 'RotationB', 'Correct', 'RT']
     logwriter = csv.DictWriter(logfile, fieldnames=fieldnames)
     logwriter.writeheader()
 
-    for tt in range(1, config.NUM_TRIALS + 1):
+    # Main trial loop
+    for trial in range(1, config.NUM_TRIALS + 1):
 
+        # Randomly choose the stimulus rotation, then rotate the stimuli
         xrot = random.choice(config.ROT_STARTS)
         xrot_offset = random.choice(config.ROT_OFFSETS)
 
@@ -86,14 +88,14 @@ with open('data/explog.csv', 'w') as logfile:
         assert 'left' in resp or 'right' in resp
 
         correct_resp = 'left' if scene.meshes == condA else 'right'
-        correct = correct_resp in resp
+        was_correct = correct_resp in resp
 
         # Log Trial Data
-        trialdata = {'Trial': tt,
+        trialdata = {'Trial': trial,
                      'Match': True if scene.meshes == condA else False,
                      'RotationA': xrot,
                      'RotationB': xrot + xrot_offset,
-                     'Correct': correct,
+                     'Correct': was_correct,
                      'RT': response_time}
         logwriter.writerow(trialdata)
 
@@ -106,7 +108,7 @@ with open('data/explog.csv', 'w') as logfile:
             time.sleep(.016)
 
         # Display green if correct and red if incorrect.
-        scene.bgColor =  (0., .5, 0.) if correct else (.5, 0., 0.)
+        scene.bgColor =  (0., .5, 0.) if was_correct else (.5, 0., 0.)
         with rc.default_shader:
             scene.draw()
         window.flip()
