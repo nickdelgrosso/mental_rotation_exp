@@ -18,9 +18,8 @@ stim_orig = reader.get_mesh('OrigStim', position=(-.25, 0., -1), rotation=(0, co
 stim_orig2 = reader.get_mesh('OrigStim', position = (.25, 0., -1), rotation=(0, config.YROT, 0), scale=config.SCALE)
 stim_flipped = reader.get_mesh('FlippedStim', position = (.25, 0., -1), rotation=(0, config.YROT, 0), scale=config.SCALE)
 
-scene = rc.Scene(meshes=[])
+scene = rc.Scene(meshes=[], camera=rc.Camera(projection=rc.OrthoProjection(origin='center', coords='relative'))
 scene.light.position.z = 20
-scene.camera.projection = rc.OrthoProjection(origin='center', coords='relative')
 
 # Make Groups of Stimuli to refer to in experiment
 stims = [stim_orig, stim_orig2, stim_flipped]
